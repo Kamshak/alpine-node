@@ -36,4 +36,8 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
   apk del curl make gcc g++ binutils-gold python linux-headers paxctl gnupg ${DEL_PKGS} && \
   rm -rf /etc/ssl /node-${VERSION}.tar.gz /SHASUMS256.txt.asc /node-${VERSION} ${RM_DIRS} \
     /usr/share/man /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg \
-    /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html
+    /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html;
+
+RUN apk add --update --no-cache bzip2 python git make gcc g++; python --version && \
+ npm install -g fibers@1.0.8 && \
+ apk del bzip2 python git make gcc g++;
