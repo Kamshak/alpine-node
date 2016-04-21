@@ -39,7 +39,7 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
     /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html;
     
 RUN apk add --update --no-cache bzip2 python git make gcc g++ \
- && npm install -g fibers@1.0.8 \
+ && npm install -g git+https://git@github.com/Kamshak/node-fibers.git \
  && apk del bzip2 python git make gcc g++ \
  && mkdir /opt \
  && mv -v /usr/lib/node_modules/fibers /opt \
