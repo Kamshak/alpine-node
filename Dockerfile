@@ -37,39 +37,12 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
   rm -rf /etc/ssl /node-${VERSION}.tar.gz /SHASUMS256.txt.asc /node-${VERSION} ${RM_DIRS} \
     /usr/share/man /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg \
     /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html;
-
-ENV GLIBC_VERSION 2.23-r1
-
-# Download and install glibc
-RUN apk add --update curl && \
-  curl -o glibc.apk -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
-  apk add --allow-untrusted glibc.apk && \
-  curl -o glibc-bin.apk -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk" && \
-  apk add --allow-untrusted glibc-bin.apk && \
-  /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc/usr/lib && \
-  echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf && \
-  apk del curl && \
-  rm -f glibc.apk glibc-bin.apk && \
-  rm -rf /var/cache/apk/*;
-
+    
 RUN apk add --update --no-cache bzip2 python git make gcc g++ \
  && npm install -g fibers@1.0.8 \
-# && ldd /usr/lib/node_modules/fibers/bin/linux-x64-v8-3.14/fibers.node \
  && apk del bzip2 python git make gcc g++ \
  && mkdir /opt \
  && mv -v /usr/lib/node_modules/fibers /opt \
  && cd /opt/fibers && npm link \
  && sed -i '/node build.js/d' package.json \
  && rm binding.gyp;
-
- RUN apk add --update curl && \
-   curl -o glibc.apk -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk" && \
-   apk add --allow-untrusted glibc.apk && \
-   curl -o glibc-bin.apk -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk" && \
-   apk add --allow-untrusted glibc-bin.apk && \
-   /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc/usr/lib && \
-   echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf && \
-   apk del curl && \
-   rm -f glibc.apk glibc-bin.apk && \
-   rm -rf /var/cache/apk/* \
-    && ldd /usr/lib/node_modules/fibers/bin/linux-x64-v8-3.14/fibers.node;
