@@ -39,10 +39,46 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
     /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html;
     
 RUN apk add --update --no-cache bzip2 python git make gcc g++ \
- && npm install -g git+https://git@github.com/Kamshak/node-fibers.git \
+ && npm install -g git+https://git@github.com/Kamshak/alpine-linux-node-fibers.git \
  && apk del bzip2 python git make gcc g++ \
  && mkdir /opt \
  && mv -v /usr/lib/node_modules/fibers /opt \
  && cd /opt/fibers && npm link \
  && sed -i '/node build.js/d' package.json \
- && rm binding.gyp;
+ && rm binding.gyp \
+ && cd /opt/fibers;
+
+RUN cd /opt/fibers \
+    && node quick-test.js;
+
+RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" && \
+    ALPINE_GLIBC_PACKAGE_VERSION="2.23-r1" && \
+    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    apk add --no-cache --virtual=build-dependencies wget ca-certificates && \
+    wget \
+        "https://raw.githubusercontent.com/andyshinn/alpine-pkg-glibc/master/andyshinn.rsa.pub" \
+        -O "/etc/apk/keys/andyshinn.rsa.pub" && \
+    wget \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    apk add --no-cache \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    \
+    rm "/etc/apk/keys/andyshinn.rsa.pub" && \
+    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
+    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
+    \
+    apk del glibc-i18n && \
+    \
+    apk del build-dependencies && \
+    rm \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+
+ENV LANG=C.UTF-8
