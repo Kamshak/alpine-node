@@ -29,7 +29,6 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/release
     \
     rm "/etc/apk/keys/andyshinn.rsa.pub" && \
     /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
-    /usr/glibc/usr/bin/ldconfig /lib /usr/glibc/usr/lib && \
     echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
     \
     apk del glibc-i18n && \
