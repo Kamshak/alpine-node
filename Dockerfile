@@ -80,11 +80,10 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
  && npm install -g bcrypt \
    && mv -v /usr/lib/node_modules/bcrypt /opt \
    && cd /opt/bcrypt && npm link \
-   && sed -i '/node build.js/d' package.json \
-   && rm binding.gyp \
    && cd /opt/bcrypt \
    && npm test \
-   && rm -rf node_modules/nodeunit;
+   && rm -rf node_modules/nodeunit \
+   && rm binding.gyp \;
  ;
 
  RUN apk del bzip2 python git make gcc g++;
