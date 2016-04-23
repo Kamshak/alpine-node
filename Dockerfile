@@ -84,6 +84,7 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
    && npm test \
    && rm -rf node_modules/nodeunit \
    && sed -i '/node-gyp configure/d' package.json \
+   && sed -i '/node-gyp rebuild/d' package.json \
    && rm binding.gyp \
  && apk del bzip2 python git make gcc g++;
 
