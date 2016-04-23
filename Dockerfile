@@ -89,5 +89,3 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
 
 RUN cd /opt/fibers \
     && node quick-test.js;
-
-RUN
