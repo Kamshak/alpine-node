@@ -72,16 +72,19 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
 
 RUN apk add --update --no-cache bzip2 python git make gcc g++ \
  && npm install -g git+https://git@github.com/Kamshak/alpine-linux-node-fibers.git \
- && mkdir /opt \
- && mv -v /usr/lib/node_modules/fibers /opt \
- && cd /opt/fibers && npm link \
- && sed -i '/node build.js/d' package.json \
- && rm binding.gyp \
+   && mkdir /opt \
+   && mv -v /usr/lib/node_modules/fibers /opt \
+   && cd /opt/fibers && npm link \
+   && sed -i '/node build.js/d' package.json \
+   && rm binding.gyp \
  && npm install -g bcrypt \
- && mv -v /usr/lib/node_modules/bcrypt /opt \
- && cd /opt/bcrypt && npm link \
- && sed -i '/node build.js/d' package.json \
- && rm binding.gyp \
+   && mv -v /usr/lib/node_modules/bcrypt /opt \
+   && cd /opt/bcrypt && npm link \
+   && sed -i '/node build.js/d' package.json \
+   && rm binding.gyp \
+   && cd /opt/bcrypt \
+   && npm test \
+   && rm -rf node_modules/nodeunit;
  ;
 
  RUN apk del bzip2 python git make gcc g++;
@@ -89,6 +92,4 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
 RUN cd /opt/fibers \
     && node quick-test.js;
 
-RUN cd /opt/bcrypt \
-    && npm test \
-    && rm -rf node_modules/nodeunit;
+RUN
