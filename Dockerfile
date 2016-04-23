@@ -9,35 +9,35 @@ ENV VERSION=v0.10.44 CFLAGS="-D__USE_MISC" NPM_VERSION=2
 # ENV CONFIG_FLAGS="--without-npm" RM_DIRS=/usr/include
 # ENV CONFIG_FLAGS="--fully-static --without-npm" DEL_PKGS="libgcc libstdc++" RM_DIRS=/usr/include
 
-RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" && \
-    ALPINE_GLIBC_PACKAGE_VERSION="2.23-r1" && \
-    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    apk add --no-cache --virtual=build-dependencies wget ca-certificates && \
-    wget \
-        "https://raw.githubusercontent.com/andyshinn/alpine-pkg-glibc/master/andyshinn.rsa.pub" \
-        -O "/etc/apk/keys/andyshinn.rsa.pub" && \
-    wget \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
-    apk add --no-cache \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
-    \
-    rm "/etc/apk/keys/andyshinn.rsa.pub" && \
-    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
-    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
-    \
-    apk del glibc-i18n && \
-    \
-    apk del build-dependencies && \
-    rm \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+#RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" && \
+#    ALPINE_GLIBC_PACKAGE_VERSION="2.23-r1" && \
+#    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+#    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+#    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+#    apk add --no-cache --virtual=build-dependencies wget ca-certificates && \
+#    wget \
+#        "https://raw.githubusercontent.com/andyshinn/alpine-pkg-glibc/master/andyshinn.rsa.pub" \
+#        -O "/etc/apk/keys/andyshinn.rsa.pub" && \
+#    wget \
+#        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+#    apk add --no-cache \
+#        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+#    \
+#    rm "/etc/apk/keys/andyshinn.rsa.pub" && \
+#    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
+#    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
+#    \
+#    apk del glibc-i18n && \
+#    \
+#    apk del build-dependencies && \
+#    rm \
+#        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+#        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 ENV LANG=C.UTF-8
 
@@ -69,16 +69,23 @@ RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxc
   rm -rf /etc/ssl /node-${VERSION}.tar.gz /SHASUMS256.txt.asc /node-${VERSION} ${RM_DIRS} \
     /usr/share/man /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg \
     /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html;
-    
+
 RUN apk add --update --no-cache bzip2 python git make gcc g++ \
  && npm install -g git+https://git@github.com/Kamshak/alpine-linux-node-fibers.git \
- && apk del bzip2 python git make gcc g++ \
  && mkdir /opt \
  && mv -v /usr/lib/node_modules/fibers /opt \
  && cd /opt/fibers && npm link \
  && sed -i '/node build.js/d' package.json \
  && rm binding.gyp \
- && cd /opt/fibers;
+ && npm install -g bcrypt \
+ && mkdir /opt \
+ && mv -v /usr/lib/node_modules/bcrypt /opt \
+ && cd /opt/bcrypt && npm link \
+ && sed -i '/node build.js/d' package.json \
+ && rm binding.gyp \
+ ;
+
+ RUN apk del bzip2 python git make gcc g++;
 
 RUN cd /opt/fibers \
     && node quick-test.js;
