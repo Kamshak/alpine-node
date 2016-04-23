@@ -78,7 +78,6 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
  && sed -i '/node build.js/d' package.json \
  && rm binding.gyp \
  && npm install -g bcrypt \
- && mkdir /opt \
  && mv -v /usr/lib/node_modules/bcrypt /opt \
  && cd /opt/bcrypt && npm link \
  && sed -i '/node build.js/d' package.json \
@@ -89,3 +88,7 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
 
 RUN cd /opt/fibers \
     && node quick-test.js;
+
+RUN cd /opt/bcrypt \
+    && npm test \
+    && rm -rf node_modules/nodeunit;
