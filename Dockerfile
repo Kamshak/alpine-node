@@ -83,9 +83,8 @@ RUN apk add --update --no-cache bzip2 python git make gcc g++ \
    && cd /opt/bcrypt \
    && npm test \
    && rm -rf node_modules/nodeunit \
-   && rm binding.gyp;
-
- RUN apk del bzip2 python git make gcc g++;
+   && rm binding.gyp \
+ && apk del bzip2 python git make gcc g++;
 
 RUN cd /opt/fibers \
     && node quick-test.js;
